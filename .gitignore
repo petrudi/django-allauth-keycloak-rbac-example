@@ -1,0 +1,10 @@
+.venv
+.vscode
+.env
+__pycache__
+
+local_settings.py
+
+# prevent accidentally adding migration files, because this is a demo app
+**/migrations/*.py
+!**/migrations/__init__.py

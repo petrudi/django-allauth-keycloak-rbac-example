@@ -1,0 +1,23 @@
+services:
+  web:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - ./example:/code/example/
+      - ../../allauth:/code/allauth
+      - ./db:/srv/db
+    environment:
+      DATABASE_NAME: /srv/db/example.db
+      ALLAUTH_REGULAR_DEMO_APPS: ${ALLAUTH_REGULAR_DEMO_APPS:-0}
+      KEYCLOAK_BASE_URL: ${KEYCLOAK_BASE_URL:-http://keycloak:8080}
+      DEMO_CLIENT_SECRET: ${DEMO_CLIENT_SECRET:-demo-secret-change-me-1234567890}
+      DEMO_REALM_NAME: ${DEMO_REALM_NAME:-demo_realm}
+      DEMO_CLIENT_ID: ${DEMO_CLIENT_ID:-demo_client}
+    ports:
+      - 8000:8000
+    command:
+      - make
+      - makemigrations
+      - migrate
+      - runserver

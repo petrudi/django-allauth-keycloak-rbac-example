@@ -1,0 +1,246 @@
+#+TITLE: Keycloak Manual Setup Guide
+#+OPTIONS: toc:2 num:nil
+
+Purpose
+Set up a Keycloak realm, an OpenID Connect client for a web application, a set of client-level roles, and a demo user with specific role assignments — entirely through the Keycloak Admin Console.
+
+Target Result
+After completing this guide you will have:
+
+A realm named =demo_realm=
+
+A confidential OIDC client named =demo_client=
+
+A web application configured with the required redirect URI and web origin
+
+Client roles created under =demo_client=:
+
+=todos:none=
+
+=todos:read=
+
+=todos:read-write=
+
+=notes:none=
+
+=notes:read=
+
+=notes:read-write=
+
+A user named =demo_user= with these assigned client roles (under =demo_client=):
+
+=todos:none=
+
+=notes:read-write=
+
+Prerequisites
+
+Access to the Keycloak Admin Console with an admin account
+
+Keycloak is reachable in your browser
+
+Your application is reachable at =http://localhost:8000=
+
+Create the Realm
+
+Open the Keycloak Admin Console.
+
+In the top-left realm dropdown, choose Create realm.
+
+Set:
+
+Realm name: =demo_realm=
+
+Enabled: ON
+
+Click Create.
+
+Create the Client (=demo_client=)
+
+Go to Clients.
+
+Click Create client.
+
+Configure:
+
+Client type: OpenID Connect
+
+Client ID: =demo_client=
+
+Click Next (or Save depending on your Keycloak version).
+
+Client authentication and flows
+Set these options (names may differ slightly across Keycloak versions):
+
+Client authentication: ON
+
+Standard flow: ON
+
+Direct access grants: OFF
+
+Service accounts: OFF
+
+Save.
+
+Configure Application URLs (Redirects, Origins, Logout)
+Go to Clients → =demo_client= → Settings (or Client details).
+
+3.1 Base URLs
+Set (if the fields exist in your Keycloak version):
+
+Root URL: =http://localhost:8000=
+
+Base URL: =http://localhost:8000/=
+
+Admin URL: =http://localhost:8000=
+
+Save.
+
+3.2 Redirect URI (Required)
+In Valid redirect URIs, add:
+
+=http://localhost:8000/accounts/oidc/keycloak/login/callback/=
+
+Save.
+
+3.3 Web Origins (CORS)
+In Web origins, add:
+
+=http://localhost:8000=
+
+Save.
+
+3.4 Logout
+If you have logout-related fields available, configure:
+
+Frontchannel logout: ON
+
+Valid post logout redirect URIs (or equivalent):
+
+=http://localhost:8000/=
+
+Save.
+
+Client Secret
+Go to Clients → =demo_client= → Credentials.
+
+Locate the Client secret.
+
+Copy and store it securely for use by your application.
+
+(If your Keycloak allows setting a custom secret, you may set it according to your organization’s policy. If not, use the generated one.)
+
+Create Client Roles
+Go to Clients → =demo_client= → Roles.
+
+Create the following roles (one by one):
+
+=todos:none=
+
+=todos:read=
+
+=todos:read-write=
+
+=notes:none=
+
+=notes:read=
+
+=notes:read-write=
+
+Steps for each role:
+
+Click Create role.
+
+Enter the role name exactly (including the colon =:=).
+
+Save.
+
+Create the User (=demo_user=)
+
+Go to Users.
+
+Click Create new user.
+
+Fill:
+
+Username: =demo_user=
+
+Email: =demo@demo.com
+=
+
+First name: =demo_name=
+
+Last name: =demo_last_name=
+
+Email verified: ON
+
+Enabled: ON
+
+Click Create / Save.
+
+Set the User Password
+
+Go to Users → =demo_user=.
+
+Open the Credentials tab.
+
+Set a password:
+
+Temporary: OFF (recommended for a demo user unless you want forced change on first login)
+
+Click Set password and confirm.
+
+Assign Client Roles to the User
+
+Go to Users → =demo_user=.
+
+Open Role mapping (or Role mappings).
+
+Click Assign role.
+
+Switch the role type/filter to Client roles.
+
+Select client: =demo_client=
+
+Assign:
+
+=todos:none=
+
+=notes:read-write=
+
+Save (if required by your Keycloak UI).
+
+Verify the Setup
+9.1 Verify roles exist
+
+Go to Clients → =demo_client= → Roles
+
+Confirm all roles listed in section 5 are present.
+
+9.2 Verify user role mapping
+
+Go to Users → =demo_user= → Role mapping
+
+Confirm assigned client roles under =demo_client= include:
+
+=todos:none=
+
+=notes:read-write=
+
+9.3 Verify redirect/origin
+
+Go to Clients → =demo_client= → Settings
+
+Confirm:
+
+Valid redirect URI includes the callback URL
+
+Web origins includes =http://localhost:8000=
+
+Recommended Operational Notes
+
+Keep the client secret in a secure secret store (not in source control).
+
+Use client roles to model application permissions (read, read-write, none) per module.
+
+Prefer least privilege: assign only the minimum roles needed for each user.

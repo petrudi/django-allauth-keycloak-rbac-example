@@ -1,0 +1,89 @@
+{
+  "format": "kc-demo-export-v1",
+  "realm": "demo_realm",
+  "partial": {
+    "ifResourceExists": "OVERWRITE",
+    "clients": [
+      {
+        "clientId": "demo_client",
+        "name": "",
+        "description": "",
+        "rootUrl": "http://localhost:8000",
+        "adminUrl": "http://localhost:8000",
+        "baseUrl": "http://localhost:8000/",
+        "enabled": true,
+        "clientAuthenticatorType": "client-secret",
+        "publicClient": false,
+        "standardFlowEnabled": true,
+        "implicitFlowEnabled": false,
+        "directAccessGrantsEnabled": false,
+        "serviceAccountsEnabled": false,
+        "bearerOnly": false,
+        "frontchannelLogout": true,
+        "protocol": "openid-connect",
+        "redirectUris": [
+          "http://localhost:8000/accounts/oidc/keycloak/login/callback/"
+        ],
+        "webOrigins": [
+          "http://localhost:8000"
+        ],
+        "attributes": {
+          "post.logout.redirect.uris": "http://localhost:8000/",
+          "backchannel.logout.session.required": "true"
+        },
+        "protocolMappers": [
+          {
+            "name": "client roles",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usermodel-client-role-mapper",
+            "consentRequired": false,
+            "config": {
+              "multivalued": "true",
+              "id.token.claim": "true",
+              "access.token.claim": "true",
+              "userinfo.token.claim": "false",
+              "introspection.token.claim": "true",
+              "claim.name": "resource_access.${client_id}.roles",
+              "jsonType.label": "String",
+              "user.attribute": "foo"
+            }
+          }
+        ]
+      }
+    ],
+    "roles": {
+      "client": {
+        "demo_client": [
+          { "name": "notes:none", "description": "", "composite": false, "clientRole": true },
+          { "name": "notes:read", "description": "", "composite": false, "clientRole": true },
+          { "name": "notes:read-write", "description": "", "composite": false, "clientRole": true },
+          { "name": "todos:none", "description": "", "composite": false, "clientRole": true },
+          { "name": "todos:read", "description": "", "composite": false, "clientRole": true },
+          { "name": "todos:read-write", "description": "", "composite": false, "clientRole": true }
+        ]
+      }
+    },
+    "groups": [],
+    "identityProviders": []
+  },
+  "users": [
+    {
+      "user": {
+        "username": "demo_user",
+        "firstName": "demo_name",
+        "lastName": "demo_last_name",
+        "email": "demo@demo.com",
+        "emailVerified": true,
+        "enabled": true
+      },
+      "role_mappings": {
+        "clients": {
+          "demo_client": [
+            { "name": "notes:read-write" },
+            { "name": "todos:none" }
+          ]
+        }
+      }
+    }
+  ]
+}
