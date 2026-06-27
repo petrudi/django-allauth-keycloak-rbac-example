@@ -12,6 +12,7 @@ admin.site.login = secure_admin_login(admin.site.login)
 urlpatterns = [
     path("", TemplateView.as_view(template_name="index.html"), name="index"),
     path("accounts/", include("allauth.urls")),
+    path("api/", include("example.oidc_provider.urls")),
     path("accounts/profile/", TemplateView.as_view(template_name="profile.html")),
     path("admin/", admin.site.urls),
     path("i18n/", include("django.conf.urls.i18n")),

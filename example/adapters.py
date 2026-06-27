@@ -3,8 +3,13 @@ import json
 from typing import Any, Dict, Set
 
 from django.conf import settings
+from django.http import HttpResponseForbidden
 
+from allauth.core.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+
+from example.oidc_provider.stubs import OsUserStub
+from example.users.models import User
 
 
 def get_client_id_for_provider(provider_id: str) -> str:
@@ -87,6 +92,15 @@ def extract_roles(extra_data: Dict[str, Any], provider_id: str) -> Set[str]:
 class KeycloakRoleAdapter(DefaultSocialAccountAdapter):
     def pre_social_login(self, request, sociallogin):
         extra_data = sociallogin.account.extra_data or {}
+
+        username = extra_data.get("preferred_username")
+        if username:
+            existing = User.objects.filter(username=username).first()
+            if existing and not existing.is_oidc:
+                raise ImmediateHttpResponse(
+                    HttpResponseForbidden("Username exists as a local user.")
+                )
+
         provider_id = sociallogin.account.provider
         roles = sorted(extract_roles(extra_data, provider_id))
 
@@ -99,3 +113,11 @@ class KeycloakRoleAdapter(DefaultSocialAccountAdapter):
             sociallogin.account.save()
         except Exception:
             pass
+
+    def save_user(self, request, sociallogin, form=None):
+        user = super().save_user(request, sociallogin, form)
+        user.is_oidc = True
+        user.set_unusable_password()
+        user.save()
+        OsUserStub.create_locked_user(user.username)
+        return user
