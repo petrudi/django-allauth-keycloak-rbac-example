@@ -213,7 +213,6 @@ INSTALLED_APPS = (
     "allauth.socialaccount.providers.xing",
     "allauth.usersessions",
     "example.users",
-    "example.oidc_provider",
 )
 
 
